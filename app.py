@@ -1,0 +1,201 @@
+import os
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, session
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from werkzeug.utils import secure_filename
+
+app = Flask(__name__)
+app.secret_key = "secret123"
+
+# Upload folder
+UPLOAD_FOLDER = "static/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+# MongoDB
+client = MongoClient("mongodb://localhost:27017/")
+db = client["lost_found"]
+
+users = db["users"]
+items = db["items"]
+messages = db["messages"]
+
+# ---------------- HOME (FIXED) ---------------- #
+
+@app.route('/')
+def home():
+    if 'user' in session:
+        return redirect('/dashboard')
+    return redirect('/login')
+
+
+# ---------------- AUTH ---------------- #
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+
+        # Get form data
+        name = request.form['name']
+        username = request.form['username']   # email
+        password = request.form['password']
+
+        # Handle profile image
+        file = request.files.get('profile_pic')
+        filename = ""
+
+        if file and file.filename != "":
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        # Save to database
+        users.insert_one({
+            "name": name,
+            "username": username,
+            "password": password,
+            "profile_pic": filename
+        })
+
+        return redirect('/login')
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = users.find_one({
+            "username": request.form['username'],
+            "password": request.form['password']
+        })
+        if user:
+            session['user'] = user['username']
+            return redirect('/dashboard')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/login')
+
+
+# ---------------- DASHBOARD ---------------- #
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect('/login')
+
+    user_items = list(items.find({"user": session['user']}).sort("_id", -1))
+    return render_template('dashboard.html', items=user_items, user=session['user'])
+
+
+# ---------------- POST PAGE ---------------- #
+
+@app.route('/post')
+def post_page():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('post.html')
+
+
+@app.route('/add', methods=['POST'])
+def add():
+    if 'user' not in session:
+        return redirect('/login')
+
+    file = request.files['image']
+    filename = ""
+
+    if file and file.filename != "":
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+    items.insert_one({
+        "title": request.form['title'],
+        "description": request.form['description'],
+        "status": request.form['status'],
+        "image": filename,
+        "user": session['user'],
+        "created_at": datetime.now()
+    })
+
+    return redirect('/dashboard')
+
+
+# ---------------- SEARCH PAGE ---------------- #
+
+@app.route('/search')
+def search():
+    if 'user' not in session:
+        return redirect('/login')
+
+    query = {}
+
+    keyword = request.args.get('keyword')
+    status = request.args.get('status')
+
+    if keyword:
+        query["title"] = {"$regex": keyword, "$options": "i"}
+
+    if status:
+        query["status"] = status
+
+    results = list(items.find(query).sort("_id", -1))
+
+    return render_template('search.html', items=results, user=session['user'])
+
+
+# ---------------- DELETE ---------------- #
+
+@app.route('/delete/<id>')
+def delete(id):
+    if 'user' not in session:
+        return redirect('/login')
+
+    items.delete_one({"_id": ObjectId(id)})
+    return redirect('/dashboard')
+
+
+# ---------------- CHAT SYSTEM ---------------- #
+
+@app.route('/chat/<id>')
+def chat(id):
+    if 'user' not in session:
+        return redirect('/login')
+
+    item = items.find_one({"_id": ObjectId(id)})
+
+    chat_msgs = list(messages.find({"item_id": id}).sort("_id", 1))
+
+    return render_template(
+        'chat.html',
+        item=item,
+        messages=chat_msgs,
+        user=session['user']
+    )
+
+
+@app.route('/send_message/<id>', methods=['POST'])
+def send_message(id):
+    if 'user' not in session:
+        return redirect('/login')
+
+    item = items.find_one({"_id": ObjectId(id)})
+
+    messages.insert_one({
+        "item_id": id,
+        "sender": session['user'],
+        "receiver": item['user'],
+        "message": request.form['message'],
+        "time": datetime.now()
+    })
+
+    return redirect('/chat/' + id)
+
+
+# ---------------- RUN ---------------- #
+
+if __name__ == '__main__':
+    app.run(app.run(host='127.0.0.1', port=5000, debug=True, use_reloader=False))

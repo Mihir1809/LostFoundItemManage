@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #111;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar h2 {
+            color: #ff7b00;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff7b00;
+        }
+
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #ff7b00;
+        }
+
+        /* Cards */
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(255, 123, 0, 0.2);
+        }
+
+        .card img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0 5px;
+            color: #ff7b00;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .lost {
+            background: #ff4d4d;
+        }
+
+        .found {
+            background: #4caf50;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat {
+            background: #ff7b00;
+        }
+
+        .delete {
+            background: #ff4d4d;
+        }
+
+        .actions a {
+            margin-right: 10px;
+        }
+
+        /* Empty message */
+        .empty {
+            text-align: center;
+            color: #aaa;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2>Lost & Found</h2>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/post">Post Item</a>
+        <a href="/search">Search</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Welcome, {{ user }}</h1>
+        <p>Manage your lost and found items</p>
+    </div>
+
+    <!-- Items -->
+    {% if items %}
+        {% for item in items %}
+        <div class="card">
+
+            {% if item.image %}
+            <img src="/static/uploads/{{ item.image }}">
+            {% endif %}
+
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+
+            <span class="status {{ item.status|lower }}">
+                {{ item.status }}
+            </span>
+
+            <div class="meta">
+                Posted by: {{ item.user }} <br>
+                Date: {{ item.created_at.strftime('%d %b %Y %I:%M %p') if item.created_at }}
+            </div>
+
+            <div class="actions">
+                <a class="btn chat" href="/chat/{{ item._id }}">Chat</a>
+                <a class="btn delete" href="/delete/{{ item._id }}">Delete</a>
+            </div>
+
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty">
+            <h3>No items posted yet</h3>
+            <p>Start by adding a lost or found item</p>
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

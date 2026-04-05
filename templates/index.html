@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lost & Found System</title>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f0f0f;
+            color: white;
+        }
+
+        header {
+            background: #1a1a1a;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff7a00;
+        }
+
+        header h1 {
+            color: #ff7a00;
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .user-info {
+            font-size: 14px;
+        }
+
+        .logout {
+            color: red;
+            margin-left: 10px;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(255, 122, 0, 0.2);
+        }
+
+        h2 {
+            color: #ff7a00;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            background: #2a2a2a;
+            color: white;
+            font-weight: 600;
+        }
+
+        input[type="file"] {
+            background: none;
+        }
+
+        button {
+            background: #ff7a00;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e66b00;
+        }
+
+        .item {
+            background: #222;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ff7a00;
+        }
+
+        .item img {
+            margin-top: 10px;
+            border-radius: 8px;
+            max-width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .status {
+            float: right;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .lost {
+            background: red;
+        }
+
+        .found {
+            background: green;
+        }
+
+        .actions a {
+            margin-right: 10px;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .contact {
+            color: #00adb5;
+        }
+
+        .delete {
+            color: #ff4d4d;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>LOST & FOUND SYSTEM</h1>
+    <div class="user-info">
+        Logged in as <b>{{ user }}</b>
+        <a class="logout" href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Add Item -->
+    <div class="card">
+        <h2>Report Item</h2>
+
+        <form action="/add" method="POST" enctype="multipart/form-data">
+            <input type="text" name="title" placeholder="Item Name" required>
+            <input type="text" name="description" placeholder="Description">
+
+            <select name="status">
+                <option value="Lost">Lost</option>
+                <option value="Found">Found</option>
+            </select>
+
+            <input type="file" name="image">
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Items -->
+    <div class="card">
+        <h2>Items List</h2>
+
+        {% for item in items %}
+            <div class="item">
+
+                <strong>{{ item.title }}</strong>
+                <span class="status {{ item.status|lower }}">{{ item.status }}</span>
+
+                <p>{{ item.description }}</p>
+
+                {% if item.image %}
+                    <img src="/static/uploads/{{ item.image }}">
+                {% endif %}
+
+                <p>Posted by: <b>{{ item.user }}</b></p>
+
+                <div class="actions">
+                    <a class="contact" href="/contact/{{ item._id }}">Contact</a>
+
+                    {% if item.user == user %}
+                        <a class="delete" href="/delete/{{ item._id }}">Delete</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0f0f0f;
+            color: white;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #111;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar h2 {
+            color: #ff7b00;
+            margin: 0;
+        }
+
+        /* Chat container */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        /* Messages area */
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Message bubbles */
+        .message {
+            max-width: 60%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .sent {
+            background: #ff7b00;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .received {
+            background: #2a2a2a;
+            margin-right: auto;
+        }
+
+        .time {
+            font-size: 10px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        /* Input area */
+        .input-area {
+            display: flex;
+            padding: 10px;
+            background: #111;
+            border-top: 1px solid #333;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: white;
+        }
+
+        .input-area button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background: #ff7b00;
+            color: white;
+            cursor: pointer;
+        }
+
+        .input-area button:hover {
+            background: #e66a00;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2>Chat: {{ item.title }}</h2>
+</div>
+
+<div class="chat-container">
+
+    <!-- Messages -->
+    <div class="messages" id="chatBox">
+
+        {% for msg in messages %}
+            {% if msg.sender == user %}
+                <div class="message sent">
+                    {{ msg.message }}
+                    <div class="time">
+                        {{ msg.time.strftime('%d %b %I:%M %p') if msg.time }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="message received">
+                    <b>{{ msg.sender }}</b><br>
+                    {{ msg.message }}
+                    <div class="time">
+                        {{ msg.time.strftime('%d %b %I:%M %p') if msg.time }}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+
+    <!-- Input -->
+    <form class="input-area" method="POST" action="/send_message/{{ item._id }}">
+        <input type="text" name="message" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+    </form>
+
+</div>
+
+<script>
+    // Auto scroll to bottom
+    const chatBox = document.getElementById("chatBox");
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+</body>
+</html>

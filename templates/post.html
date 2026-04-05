@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Item</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: #111;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar h2 {
+            color: #ff7b00;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff7b00;
+        }
+
+        /* Form Container */
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 40px auto;
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 123, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #ff7b00;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #2a2a2a;
+            color: white;
+        }
+
+        input:focus, textarea:focus {
+            outline: 1px solid #ff7b00;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #ff7b00;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+        }
+
+        button:hover {
+            background: #e66a00;
+        }
+
+        /* Image Preview */
+        #preview {
+            margin-top: 10px;
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            display: none;
+            border-radius: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2>Lost & Found</h2>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/search">Search</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<!-- Form -->
+<div class="container">
+    <h2>Post Lost / Found Item</h2>
+
+    <form action="/add" method="POST" enctype="multipart/form-data">
+
+        <label>Title</label>
+        <input type="text" name="title" placeholder="Enter item title" required>
+
+        <label>Description</label>
+        <textarea name="description" placeholder="Describe the item..." required></textarea>
+
+        <label>Status</label>
+        <select name="status" required>
+            <option value="">Select</option>
+            <option value="Lost">Lost</option>
+            <option value="Found">Found</option>
+        </select>
+
+        <label>Upload Image</label>
+        <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
+
+        <img id="preview">
+
+        <button type="submit">Post Item</button>
+    </form>
+</div>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('preview');
+
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
