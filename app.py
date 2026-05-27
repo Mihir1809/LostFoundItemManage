@@ -14,7 +14,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # MongoDB
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb+srv://mihirdixit:1809200429112004@cluster0.sjfaxfw.mongodb.net/?appName=Cluster0")
 db = client["lost_found"]
 
 users = db["users"]
