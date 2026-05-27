@@ -14,6 +14,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # MongoDB
+MONGO_URI = os.environ.get("MONGO_URI")
 client = MongoClient("mongodb+srv://mihirdixit:1809200429112004@cluster0.sjfaxfw.mongodb.net/?appName=Cluster0")
 db = client["lost_found"]
 
