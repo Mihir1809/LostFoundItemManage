@@ -18,7 +18,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # ---------------- MONGODB CONNECTION ---------------- #
 
-MONGO_URI = os.environ.get("MONGO_URI")
+MONGO_URI = os.getenv("MONGO_URI")
 
 client = MongoClient(
     MONGO_URI,
